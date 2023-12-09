@@ -4,6 +4,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Checkbox, Panel, DefaultButton, TextField, SpinButton, Separator} from "@fluentui/react";
 import { SparkleFilled, ClockFilled, TargetArrowFilled, OptionsFilled, SearchInfoFilled, PersonStarFilled, TextBulletListSquareSparkleFilled } from "@fluentui/react-icons";
+import BrandLogo from "../../assets/avanade_logo.png";
 import { ITag } from '@fluentui/react/lib/Pickers';
 
 import styles from "./Chat.module.css";
@@ -250,7 +251,8 @@ const Chat = () => {
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
-                            <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" />
+                            {/* <SparkleFilled fontSize={"120px"} primaryFill={"rgba(115, 118, 225, 1)"} aria-hidden="true" aria-label="Chat logo" /> */}
+                            <img src={BrandLogo} alt="Avanade logo" style={{ width: "130px", height: "115px" }} />
                             <h1 className={styles.chatEmptyStateTitle}>Have a conversation with your private data</h1>
                             <span className={styles.chatEmptyObjectives}>
                                 The objective of the Information Assistant, built with Azure OpenAI, is to leverage a combination of AI components 
