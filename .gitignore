@@ -365,6 +365,7 @@ package-lock.json
 
 #devcontainer tools
 local.env
+local.ava.env
 main.parameters.json
 infrastructure.env
 infrastructure.debug.env
