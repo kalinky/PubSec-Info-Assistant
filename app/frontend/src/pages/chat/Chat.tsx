@@ -32,7 +32,7 @@ const Chat = () => {
     const [promptTemplate, setPromptTemplate] = useState<string>("");
     const [retrieveCount, setRetrieveCount] = useState<number>(5);
     const [useSemanticRanker, setUseSemanticRanker] = useState<boolean>(true);
-    const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(false);
+    const [useSemanticCaptions, setUseSemanticCaptions] = useState<boolean>(true);
     const [excludeCategory, setExcludeCategory] = useState<string>("");
     const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState<boolean>(false);
     const [userPersona, setUserPersona] = useState<string>("analyst");
@@ -203,6 +203,14 @@ const Chat = () => {
 
     const onUseSuggestFollowupQuestionsChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
         setUseSuggestFollowupQuestions(!!checked);
+    };
+
+    const onUseSemanticCaptionsChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+        setUseSemanticCaptions(!!checked);
+    };
+
+    const onUseSemanticRankerChange = (_ev?: React.FormEvent<HTMLElement | HTMLInputElement>, checked?: boolean) => {
+        setUseSemanticRanker(!!checked);
     };
 
     const onExampleClicked = (example: string) => {
@@ -383,6 +391,12 @@ const Chat = () => {
                                 checked={useSuggestFollowupQuestions}
                                 label="Suggest follow-up questions"
                                 onChange={onUseSuggestFollowupQuestionsChange}
+                            />
+                            <Checkbox
+                                className={styles.chatSettingsSeparator}
+                                checked={useSemanticRanker}
+                                label="Use semantic ranker"
+                                onChange={onUseSemanticRankerChange}
                             />
                             <TextField className={styles.chatSettingsSeparator} defaultValue={userPersona} label="User Persona" onChange={onUserPersonaChange} />
                             <TextField className={styles.chatSettingsSeparator} defaultValue={systemPersona} label="System Persona" onChange={onSystemPersonaChange} />
