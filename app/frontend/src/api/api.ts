@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { AskRequest, AskResponse, ChatRequest, BlobClientUrlResponse, AllFilesUploadStatus, GetUploadStatusRequest, GetInfoResponse, ActiveCitation, GetWarningBanner, StatusLogEntry, StatusLogResponse, ApplicationTitle, GetTagsResponse } from "./models";
+import { AskRequest, AskResponse, ChatRequest, BlobClientUrlResponse, AllFilesUploadStatus, GetUploadStatusRequest, GetInfoResponse, ActiveCitation, GetWarningBanner, StatusLogEntry, StatusLogResponse, ApplicationTitle, GetTagsResponse, DeleteDocumentResponse } from "./models";
 
 export async function askApi(options: AskRequest): Promise<AskResponse> {
     const response = await fetch("/ask", {
@@ -71,6 +71,25 @@ export async function chatApi(options: ChatRequest): Promise<AskResponse> {
         throw Error(parsedResponse.error || "Unknown error");
     }
    
+    return parsedResponse;
+}
+
+export async function deleteDocument(path:string): Promise<DeleteDocumentResponse> {
+    const response = await fetch("/deletedocument", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            path: path
+        })
+    });
+
+    const parsedResponse: any = await response.json();
+    if (response.status > 299 || !response.ok) {
+        console.log(response);
+        throw Error(parsedResponse.error || "Unknown error");
+    }
     return parsedResponse;
 }
 
@@ -221,3 +240,4 @@ export async function getAllTags(): Promise<GetTagsResponse> {
     var results: GetTagsResponse = {tags: parsedResponse};
     return results;
 }
+

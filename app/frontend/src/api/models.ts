@@ -165,3 +165,8 @@ export type GetTagsResponse = {
     tags: string;
     error?: string;
 }
+
+export type DeleteDocumentResponse = {
+    status: string;
+    error?: string;
+}
