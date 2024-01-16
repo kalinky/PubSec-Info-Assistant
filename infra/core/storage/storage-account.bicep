@@ -49,7 +49,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
         corsRules: [
           {
             allowedHeaders: [ '*' ]
-            allowedMethods: [ 'GET', 'PUT', 'OPTIONS', 'POST', 'PATCH', 'HEAD' ]
+            allowedMethods: [ 'GET', 'PUT', 'OPTIONS', 'POST', 'PATCH', 'HEAD', 'DELETE' ]
             allowedOrigins: [ '*' ]
             exposedHeaders: [ '*' ]
             maxAgeInSeconds: 86400}
