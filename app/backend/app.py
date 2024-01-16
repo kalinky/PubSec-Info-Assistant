@@ -18,6 +18,7 @@ from azure.storage.blob import (
     AccountSasPermissions,
     BlobServiceClient,
     ResourceTypes,
+    BlobPrefix,
     generate_account_sas,
 )
 from flask import Flask, jsonify, request
@@ -213,7 +214,7 @@ def get_blob_client_url():
             read=True,
             write=True,
             list=True,
-            delete=False,
+            delete=True,
             add=True,
             create=True,
             update=True,
@@ -318,6 +319,56 @@ def get_all_tags():
         logging.exception("Exception in /getalltags")
         return jsonify({"error": str(ex)}), 500
     return jsonify(results)
+
+def delete_blob(container, prefix:any):
+    """Delete all blobs in a container with a given prefix"""
+    for blob in container.list_blobs(name_starts_with=prefix):
+        if isinstance(blob, BlobPrefix):
+            # Call recursively if the blob is a prefix
+            delete_blob(container, blob.name)
+        else:
+            container.delete_blob(blob)
+            logging.info(f"Deleted blob {blob.name} from container {container}")  
+
+
+@app.route("/deletedocument", methods=["POST"])
+def delete_document():
+    """Deletes document based on path"""
+
+    try:
+        path = request.json["path"]
+
+        upload_container = blob_client.get_container_client("upload")
+        file_name = path["name"]
+
+        # Delete document from upload container
+        logging.info(f"Deleting document from upload container: {file_name}")
+        delete_blob(upload_container, file_name)
+
+        # Delete document from content container
+        content_container = blob_client.get_container_client("content")
+        logging.info(f"Deleting document from content container: {file_name}")
+        delete_blob(content_container, file_name)
+     
+        # Delete document from AI Search
+        search_results = search_client.search(search_text=file_name) #, filter = f"file_name eq '{file_name}'"
+        for result in search_results:
+            logging.info(f"\tFound result, deleting: {result['file_name']}")
+            result = search_client.delete_documents(documents=[{'id': result['id']}])
+            logging.info(f"\tDeletion of documents from search index succeeded: {result[0].succeeded}")
+
+        # Remove from Logs in statusdb container in CosmosDB
+        
+        statusLog.delete_document(document_path=file_name)
+
+        tagsHelper.delete_document(document_path=file_name)
+
+        
+    except Exception as ex:
+        logging.exception("Exception in /deletedocument")
+        return jsonify({"error": str(ex)}), 500
+    return jsonify({"status": 200})
+
 
 if __name__ == "__main__":
     logging.info("IA WebApp Starting Up...")
