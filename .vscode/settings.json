@@ -13,5 +13,6 @@
         "latex",
         "plaintext",
         "shellscript"
-    ]
+    ],
+    "search.useIgnoreFiles": false
 }

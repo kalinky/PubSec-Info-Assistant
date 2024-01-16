@@ -53,9 +53,10 @@ check-subscription:
 take-dir-ownership:
 	@sudo chown -R vscode .
 
-destroy-inf: check-subscription
+destroy-inf: check-subscription ## Destroy infrastructure
 	@./scripts/inf-destroy.sh
 
 functional-tests: extract-env ## Run functional tests to check the processing pipeline is working
 	@./scripts/functional-tests.sh	
 
+	

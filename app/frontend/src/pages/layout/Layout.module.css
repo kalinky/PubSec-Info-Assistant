@@ -9,7 +9,8 @@
 }
 
 .header {
-    background-color: #222222;
+    /* background-color: #222222; */
+    background: linear-gradient(to right, #ff5800, #ffb414);
     color: #f2f2f2;
 }
 
@@ -31,6 +32,7 @@
 
 .headerLogo {
     height: 40px;
+    margin : 10px 0;
 }
 
 .headerTitle {
