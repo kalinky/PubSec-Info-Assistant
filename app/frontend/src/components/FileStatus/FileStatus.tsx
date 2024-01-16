@@ -4,7 +4,8 @@
 import { useState } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
 import { Stack } from "@fluentui/react";
-import { DocumentsDetailList, IDocument } from "./DocumentsDetailList";
+import { IDocument } from "./DocumentsDetailList";
+import { DocumentsDetailList } from "./DocumentsDetailList";
 import { ArrowClockwise24Filled } from "@fluentui/react-icons";
 import { animated, useSpring } from "@react-spring/web";
 import { getAllUploadStatus, FileUploadBasicStatus, GetUploadStatusRequest, FileState } from "../../api";
@@ -16,6 +17,7 @@ const dropdownFileStateStyles: Partial<IDropdownStyles> = { dropdown: { width: 2
 
 const dropdownTimespanOptions = [
     { key: 'Time Range', text: 'End time range', itemType: DropdownMenuItemType.Header },
+    { key: 'anytime', text: 'Any time' },
     { key: '4hours', text: '4 hours' },
     { key: '12hours', text: '12 hours' },
     { key: '24hours', text: '24 hours' },
@@ -57,7 +59,7 @@ export const FileStatus = ({ className }: Props) => {
 
     const onGetStatusClick = async () => {
         setIsLoading(true);
-        var timeframe = 4;
+        var timeframe = -1;
         switch (selectedTimeFrameItem?.key as string) {
             case "4hours":
                 timeframe = 4;
@@ -75,7 +77,7 @@ export const FileStatus = ({ className }: Props) => {
                 timeframe = 43200;
                 break;
             default:
-                timeframe = 4;
+                timeframe = -1;
                 break;
         }
 
@@ -133,7 +135,7 @@ export const FileStatus = ({ className }: Props) => {
             <div className={`${styles.options} ${className ?? ""}`} >
             <Dropdown
                     label="Uploaded in last:"
-                    defaultSelectedKey='4hours'
+                    defaultSelectedKey='anytime'
                     onChange={onTimeSpanChange}
                     placeholder="Select a time range"
                     options={dropdownTimespanOptions}
