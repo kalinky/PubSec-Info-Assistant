@@ -1,11 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { useState } from "react";
-import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn, Selection, Label, BaseSelectedItemsList } from "@fluentui/react";
-import { TooltipHost } from '@fluentui/react';
+import { useCallback, useState } from "react";
+import { DetailsList, DetailsListLayoutMode, SelectionMode, IColumn, Selection, Label, BaseSelectedItemsList, Link, DialogContent } from "@fluentui/react";
+import { Dialog, DialogTrigger, DialogSurface, DialogTitle, DialogBody, DialogActions, Button } from '@fluentui/react-components';
+import { TooltipHost, IconButton } from '@fluentui/react';
 
 import styles from "./DocumentsDetailList.module.css";
+import { BlobServiceClient } from "@azure/storage-blob";
+import { getBlobClientUrl, deleteDocument } from "../../api";
 
 export interface IDocument {
     key: string;
@@ -24,7 +27,7 @@ interface Props {
     onFilesSorted?: (items: IDocument[]) => void;
 }
 
-export const DocumentsDetailList = ({ items, onFilesSorted}: Props) => {
+export const DocumentsDetailList = ({ items, onFilesSorted }: Props) => {
 
     const onColumnClick = (ev: React.MouseEvent<HTMLElement>, column: IColumn): void => {
         const newColumns: IColumn[] = columns.slice();
@@ -54,10 +57,28 @@ export const DocumentsDetailList = ({ items, onFilesSorted}: Props) => {
     }
 
     function onItemInvoked(item: any): void {
-        alert(`Item invoked: ${item.name}`);
+        // TODO: show dialog to confirm file delete
+        setSelectedItem(item);
+        console.log(`Item invoked: ${item.name}`);
     }
 
-    const [columns, setColumns] = useState<IColumn[]> ([
+    const [selectedItem, setSelectedItem] = useState<IDocument | null>(null);
+    const [open, setOpen] = useState(false);
+
+    function onDeleteConfirmed(item: any): void {
+        // Delete the file here
+        console.log(`Deleting item ${item.name}: `, item);
+        handleDeleteFile(item);
+    }
+
+    const handleDeleteFile = useCallback(async (item: any) => {
+        //do some actions here
+        const result = await deleteDocument(item);
+
+        return result;
+    }, []);
+
+    const [columns, setColumns] = useState<IColumn[]>([
         {
             key: 'column1',
             name: 'File Type',
@@ -142,6 +163,31 @@ export const DocumentsDetailList = ({ items, onFilesSorted}: Props) => {
                 return <span>{item.modified_timestamp}</span>;
             },
         },
+        {
+            key: 'column6',
+            name: 'Actions',
+            fieldName: 'Actions',
+            minWidth: 16,
+            maxWidth: 16,
+            // isIconOnly: true,
+            ariaLabel: 'Column operations for delete or edit actions',
+            onColumnClick: onColumnClick,
+            onRender: (item: IDocument) => {
+                return <>
+                    <IconButton
+                        style={{ color: "black" }}
+                        iconProps={{ iconName: "Delete" }}
+                        title="Delete"
+                        ariaLabel="Delete"
+                        onClick={() => {
+                            // console.log('clicked', item);
+                            // setOpen(true); 
+                            onDeleteConfirmed(item);
+                        }}
+                    />
+                </>
+            },
+        },
     ]);
 
     return (
@@ -159,6 +205,36 @@ export const DocumentsDetailList = ({ items, onFilesSorted}: Props) => {
                 onItemInvoked={onItemInvoked}
             />
             <span className={styles.footer}>{"(" + items.length as string + ") records."}</span>
+            {/* <Dialog
+                open={open}
+                onOpenChange={(event, data) => {
+                    // it is the users responsibility to react accordingly to the open state change
+                    setOpen(data.open);
+                }}
+                // dialogContentProps={{
+                //     type: DialogType.normal,
+                //     title: 'Confirm Delete',
+                //     subText: `Are you sure you want to delete ${selectedItem?.name}?`,
+                // }}
+                // modalProps={{
+                //     isBlocking: true,
+                //     styles: { main: { maxWidth: 450 } },
+                // }}
+            >
+                <DialogSurface>
+                    <DialogBody>
+                        <DialogTitle>Confirm Delete</DialogTitle>
+                        <DialogContent>
+                            Are you sure you want to delete xxx?
+                        </DialogContent>
+                    </DialogBody>
+                </DialogSurface>
+                <DialogActions>
+                    <Button appearance="primary" onClick={() => alert("todo: not yet implemented, file to be deleted")}>Delete</Button>
+                    <Button appearance="secondary">Cancel</Button>
+                </DialogActions>
+            </Dialog> */}
+
         </div>
     );
 }
