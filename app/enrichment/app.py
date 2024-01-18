@@ -56,8 +56,7 @@ ENV = {
     "BLOB_CONNECTION_STRING": None,
     "TARGET_EMBEDDINGS_MODEL": None,
     "EMBEDDING_VECTOR_SIZE": None,
-    "AZURE_SEARCH_SERVICE_ENDPOINT": None,
-    "AZURE_BLOB_STORAGE_ENDPOINT": None
+    "AZURE_SEARCH_SERVICE_ENDPOINT": None
 }
 
 for key, value in ENV.items():
@@ -247,7 +246,8 @@ def embed_texts(model: str, texts: List[str]):
 
 def index_sections(chunks):
     """ Pushes a batch of content to the search index
-    """    
+    """
+
     search_client = SearchClient(endpoint=ENV["AZURE_SEARCH_SERVICE_ENDPOINT"],
                                     index_name=ENV["AZURE_SEARCH_INDEX"],
                                     credential=search_creds)    
@@ -255,6 +255,21 @@ def index_sections(chunks):
     results = search_client.upload_documents(documents=chunks)
     succeeded = sum([1 for r in results if r.succeeded])
     log.debug(f"\tIndexed {len(results)} chunks, {succeeded} succeeded")
+
+def index_delete_document(file_name):
+    """Deletes document with id from search index"""
+
+    # TODO: using searchclient here - see example
+    search_client = SearchClient(endpoint=ENV["AZURE_SEARCH_SERVICE_ENDPOINT"],
+                                    index_name=ENV["AZURE_SEARCH_INDEX"],
+                                    credential=search_creds)    
+    result = search_client.delete_documents(documents=[{'file_name': file_name}])
+
+    log.info(f"\tDeletion of documents from search index succeeded: {result[0].succeeded}")
+
+    # Example:
+    # result = search_client.delete_documents(documents=[{"hotelId": "1000"}])
+    # print("Delete new document succeeded: {}".format(result[0].succeeded))
 
 def get_tags_and_upload_to_cosmos(blob_service_client, blob_path):
     """ Gets the tags from the blob metadata and uploads them to cosmos db"""
