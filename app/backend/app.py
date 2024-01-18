@@ -340,6 +340,7 @@ def delete_document():
 
         upload_container = blob_client.get_container_client("upload")
         file_name = path["name"]
+        key = path["key"]
 
         # Delete document from upload container
         logging.info(f"Deleting document from upload container: {file_name}")
@@ -349,7 +350,7 @@ def delete_document():
         content_container = blob_client.get_container_client("content")
         logging.info(f"Deleting document from content container: {file_name}")
         delete_blob(content_container, file_name)
-     
+
         # Delete document from AI Search
         search_results = search_client.search(search_text=file_name) #, filter = f"file_name eq '{file_name}'"
         for result in search_results:
@@ -358,12 +359,10 @@ def delete_document():
             logging.info(f"\tDeletion of documents from search index succeeded: {result[0].succeeded}")
 
         # Remove from Logs in statusdb container in CosmosDB
-        
-        statusLog.delete_document(document_path=file_name)
+        statusLog.delete_document(id=key, document_path=file_name)
 
-        tagsHelper.delete_document(document_path=file_name)
+        tagsHelper.delete_document(id=key, document_path=f"upload/{file_name}")
 
-        
     except Exception as ex:
         logging.exception("Exception in /deletedocument")
         return jsonify({"error": str(ex)}), 500

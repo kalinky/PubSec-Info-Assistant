@@ -226,6 +226,16 @@ class StatusLog:
         except Exception as err:
             logging.error(f"An error occurred while updating the document state: {str(err)}")      
 
+    def delete_document(self, id, document_path):
+        """Deletes the document from the storage"""
+        try:
+            item = self.container.query_items(query=f"SELECT * FROM c WHERE c.id = '{id}'", enable_cross_partition_query=True)
+            if len(list(item)) == 1:
+                logging.info(f"Deleting DocumentID - {id}")
+                self.container.delete_item(item=id, partition_key=document_path)
+        except Exception as err:
+            logging.error(f"An error occurred while deleting the document: {str(err)}")
+
     def save_document(self, document_path):
         """Saves the document in the storage"""
         document_id = self.encode_document_id(document_path)

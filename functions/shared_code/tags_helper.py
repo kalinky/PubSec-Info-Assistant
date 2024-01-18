@@ -4,6 +4,8 @@
 from azure.cosmos import CosmosClient, PartitionKey
 import traceback, sys
 import base64
+import logging
+
 
 class TagsHelper:
     """ Helper class for tag functions"""
@@ -43,6 +45,16 @@ class TagsHelper:
             "tags": tags_list
         }
         self.container.upsert_item(document)
+
+    def delete_document(self, id, document_path):
+        """Deletes the tag document from the storage"""
+        try:
+            item = self.container.query_items(query=f"SELECT * FROM c WHERE c.id = '{id}'", enable_cross_partition_query=True)
+            if len(list(item)) == 1:
+                logging.info(f"Deleting tag DocumentID - {id}")
+                self.container.delete_item(item=id, partition_key=document_path)
+        except Exception as err:
+                logging.error(f"An error occurred while deleting the document: {str(err)}")
 
     def encode_document_id(self, document_id):
         """ encode a path/file name to remove unsafe chars for a cosmos db id """
