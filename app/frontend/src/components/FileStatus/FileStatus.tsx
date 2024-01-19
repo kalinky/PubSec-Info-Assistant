@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dropdown, DropdownMenuItemType, IDropdownOption, IDropdownStyles } from '@fluentui/react/lib/Dropdown';
 import { Stack } from "@fluentui/react";
 import { IDocument } from "./DocumentsDetailList";
@@ -23,7 +23,6 @@ const dropdownTimespanOptions = [
     { key: '24hours', text: '24 hours' },
     { key: '7days', text: '7 days' },
     { key: '30days', text: '30 days' },
-    { key: 'anytime', text: 'Any time' },
   ];
 
 const dropdownFileStateOptions = [
@@ -58,6 +57,12 @@ export const FileStatus = ({ className }: Props) => {
         setFiles(items);
     };
 
+    const fetchItems = async (request:GetUploadStatusRequest) => {
+        const response = await getAllUploadStatus(request);
+        const list = convertStatusToItems(response.statuses);
+        setFiles(list);
+    };
+
     const onGetStatusClick = async () => {
         setIsLoading(true);
         var timeframe = -1;
@@ -89,10 +94,8 @@ export const FileStatus = ({ className }: Props) => {
             timeframe: timeframe,
             state: selectedFileStateItem?.key == undefined ? FileState.All : selectedFileStateItem?.key as FileState
         }
-        const response = await getAllUploadStatus(request);
-        const list = convertStatusToItems(response.statuses);
+        fetchItems(request);
         setIsLoading(false);
-        setFiles(list);
     }
 
     function convertStatusToItems(fileList: FileUploadBasicStatus[]) {
@@ -133,6 +136,13 @@ export const FileStatus = ({ className }: Props) => {
         from: { opacity: 0 },
         to: { opacity: 1 }
     });
+
+    useEffect(() => {
+        fetchItems({ 
+            timeframe: -1, 
+            state: FileState.All
+        });
+    }, []);
 
     return (
         <div className={styles.container}>
