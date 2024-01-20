@@ -1,6 +1,19 @@
-# Notes
+# Avanade Branding Notes
 
-## Avanade Branding
+## Avanade Colours
+
+| Colour | Codes |
+|--|--|
+| Avanade orange (bright) | rgba(255, 88, 0, 1) |
+| | #FF5800 |
+| Avanade dark orange | RGB rgba(204, 70, 0, 1) |
+| | HEX #DC4600 |
+| Very light orange | #fff2eb |
+
+Check out colorhexa for shades and tints variations: https://www.colorhexa.com/FF5800
+
+
+## Replacements
 
 |Component/UI element|Original Style|Avanade Style|
 |--|--|--|
