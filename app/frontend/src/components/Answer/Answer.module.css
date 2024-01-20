@@ -23,7 +23,7 @@
 }
 
 .selected {
-    outline: 2px solid rgba(115, 118, 225, 1);
+    outline: 2px solid rgba(204, 70, 0, 1);
 }
 
 .citationLearnMore {
@@ -38,8 +38,8 @@
     text-align: center;
     border-radius: 4px;
     padding: 0px 8px;
-    background: #d1dbfa;
-    color: #123bb6;
+    background: #fff2eb;
+    color: #FF5800;
     text-decoration: none;
     cursor: pointer;
 }
@@ -93,8 +93,8 @@ sup {
     min-width: 14px;
     height: 14px;
     border-radius: 3px;
-    background: #d1dbfa;
-    color: #123bb6;
+    background: #fff2eb;
+    color: #DC4600;
     text-decoration-color: transparent;
     outline: transparent solid 1px;
     cursor: pointer;
