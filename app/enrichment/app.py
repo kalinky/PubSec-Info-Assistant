@@ -258,8 +258,6 @@ def index_sections(chunks):
 
 def index_delete_document(file_name):
     """Deletes document with id from search index"""
-
-    # TODO: using searchclient here - see example
     search_client = SearchClient(endpoint=ENV["AZURE_SEARCH_SERVICE_ENDPOINT"],
                                     index_name=ENV["AZURE_SEARCH_INDEX"],
                                     credential=search_creds)    

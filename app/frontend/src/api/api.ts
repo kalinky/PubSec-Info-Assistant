@@ -93,6 +93,28 @@ export async function deleteDocument(path:string): Promise<DeleteDocumentRespons
     return parsedResponse;
 }
 
+export async function pushToEmbeddingsQueue(item:any): Promise<string> {
+
+    const response = await fetch("/pushtoembeddingsqueue", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            "blob_name": "upload/Perth Airport/02. Perth Airport Acceptable Use Policy.pdf",
+            "blob_uri": "https://infoasststorewynrx.blob.core.windows.net/upload/Perth Airport/02. Perth Airport Acceptable Use Policy.pdf",
+            "submit_queued_count": 1
+        })
+    });
+
+    const parsedResponse: any = await response.json();
+    if (response.status > 299 || !response.ok) {
+        console.log(response);
+        throw Error(parsedResponse.error || "Unknown error");
+    }
+    return parsedResponse;
+}
+
 export function getCitationFilePath(citation: string): string {
     return `${encodeURIComponent(citation)}`;
 }

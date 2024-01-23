@@ -8,7 +8,7 @@ import { TooltipHost, IconButton } from '@fluentui/react';
 
 import styles from "./DocumentsDetailList.module.css";
 import { BlobServiceClient } from "@azure/storage-blob";
-import { getBlobClientUrl, deleteDocument } from "../../api";
+import { getBlobClientUrl, deleteDocument, pushToEmbeddingsQueue } from "../../api";
 
 export interface IDocument {
     key: string;
@@ -71,9 +71,27 @@ export const DocumentsDetailList = ({ items, onFilesSorted }: Props) => {
         handleDeleteFile(item);
     }
 
+    function onReindexRequested(item: any): void {
+        // Create an item in the embeddings queue
+        console.log(`Creating embeddings queue item for ${item.name}: `, item);
+        handlePushToEmbeddingsQueue(item);
+    }
+
     const handleDeleteFile = useCallback(async (item: any) => {
-        //do some actions here
         const result = await deleteDocument(item);
+
+        if (result.status === "200") {
+            //TODO: remove item from list
+            console.log("item should be removed", result);
+            // items.remove(item);
+            //TODO: refresh list
+        }
+
+        return result;
+    }, []);
+
+    const handlePushToEmbeddingsQueue = useCallback(async (item: any) => {
+        const result = await pushToEmbeddingsQueue(item);
 
         return result;
     }, []);
@@ -185,9 +203,20 @@ export const DocumentsDetailList = ({ items, onFilesSorted }: Props) => {
                             onDeleteConfirmed(item);
                         }}
                     />
+                    <IconButton
+                        style={{ color: "black" }}
+                        iconProps={{ iconName: "Insert" }}
+                        title="Reindex"
+                        ariaLabel="Reindex"
+                        onClick={() => {
+                            // console.log('clicked', item);
+                            // setOpen(true); 
+                            onReindexRequested(item);
+                        }}
+                    />
                 </>
             },
-        },
+        }
     ]);
 
     return (

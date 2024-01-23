@@ -21,6 +21,7 @@ from azure.storage.blob import (
     BlobPrefix,
     generate_account_sas,
 )
+from azure.storage.queue import QueueClient, TextBase64EncodePolicy
 from flask import Flask, jsonify, request
 from shared_code.status_log import State, StatusClassification, StatusLog
 from shared_code.tags_helper import TagsHelper
@@ -74,6 +75,8 @@ QUERY_TERM_LANGUAGE = os.environ.get("QUERY_TERM_LANGUAGE") or "English"
 
 TARGET_EMBEDDING_MODEL = os.environ.get("TARGET_EMBEDDINGS_MODEL") or "BAAI/bge-small-en-v1.5"
 ENRICHMENT_APPSERVICE_NAME = os.environ.get("ENRICHMENT_APPSERVICE_NAME") or "enrichment"
+EMBEDDINGS_QUEUE = os.environ.get("EMBEDDINGS_QUEUE") or "embeddings-queue"
+BLOB_CONNECTION_STRING = os.environ.get("BLOB_CONNECTION_STRING")
 
 # embedding_service_suffix = "xyoek"
 
@@ -366,6 +369,33 @@ def delete_document():
         
     except Exception as ex:
         logging.exception("Exception in /deletedocument")
+        return jsonify({"error": str(ex)}), 500
+    return jsonify({"status": 200})
+
+@app.route("/pushtoembeddingsqueue", methods=["POST"])
+def pushToEmbeddingsQueue():
+    """Creates an item in the embeddings queue to trigger embedding and search indexing"""
+    try:
+        blob_name = request.json["blob_name"]
+        blob_uri = request.json["blob_uri"]
+        
+        # submit message to the text enrichment queue to continue processing  
+        queue_client = QueueClient.from_connection_string(
+            conn_str=BLOB_CONNECTION_STRING, 
+            queue_name=EMBEDDINGS_QUEUE, 
+            message_encode_policy=TextBase64EncodePolicy())
+        
+        message_json = {
+            'blob_name': blob_name,
+            'bob_uri': blob_uri,
+            'submit_queued_count': 1
+        }
+        message_string = json.dumps(message_json)
+        queue_client.send_message(message_string)
+        statusLog.upsert_document(blob_name, f"Frontend - message sent to enrichment queue", StatusClassification.DEBUG, State.QUEUED)    
+        
+    except Exception as ex:
+        logging.exception("Exception in /logstatus")
         return jsonify({"error": str(ex)}), 500
     return jsonify({"status": 200})
 
